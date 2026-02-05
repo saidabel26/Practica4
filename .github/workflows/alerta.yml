@@ -1,4 +1,4 @@
-name: Test hola_mundo.js
+name: Test hola_mundo.js y alerta en fallo
 
 on:
   push:
@@ -16,7 +16,16 @@ jobs:
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: '18'
+
+      - name: Verificar archivos
+        run: |
+          echo "Archivos en el directorio:"
+          ls -la
+          echo "Contenido de hola_mundo.js:"
+          cat hola_mundo.js || echo "hola_mundo.js no encontrado"
+          echo "Contenido de test.js:"
+          cat test.js || echo "test.js no encontrado"
 
       - name: Ejecutar test
         run: node test.js
@@ -27,4 +36,12 @@ jobs:
           curl -X POST https://ntfy.sh/devops-itla \
             -H "Title: ❌ Test fallido en GitHub Actions" \
             -H "Priority: high" \
-            -d "El test de hola.js falló en el repositorio ${{ github.repository }} (commit: ${{ github.sha }})"
+            -H "Tags: warning,fire" \
+            -d "Repositorio: ${{ github.repository }}
+                Rama: ${{ github.ref_name }}
+                Commit: ${{ github.sha }}
+                Autor: ${{ github.actor }}
+                Ejecución: ${{ github.run_id }}
+                Trabajo: test
+                
+                El test de hola_mundo.js falló. Revisa los logs de GitHub Actions."
