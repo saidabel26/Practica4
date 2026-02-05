@@ -3,7 +3,7 @@ name: Test hola_mundo.js
 on:
   push:
     branches:
-      - dev
+      - main
 
 jobs:
   test:
