@@ -1,0 +1,30 @@
+name: Test hola_mundo.js
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Ejecutar test
+        run: node test.js
+
+      - name: Notificar fallo en ntfy
+        if: failure()
+        run: |
+          curl -X POST https://ntfy.sh/devops-itla \
+            -H "Title: ❌ Test fallido en GitHub Actions" \
+            -H "Priority: high" \
+            -d "El test de hola.js falló en el repositorio ${{ github.repository }} (commit: ${{ github.sha }})"
